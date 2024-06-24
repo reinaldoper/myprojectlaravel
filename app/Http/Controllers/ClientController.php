@@ -96,7 +96,7 @@ class ClientController extends Controller
             $client = Cliente::findOrFail($id);
 
             $validated = $request->validate([
-                'name' => 'sometimes|required',
+                'nome' => 'sometimes|required',
                 'cpf' => 'sometimes|required|unique:clientes,cpf,' . $client->id,
                 'telefones.*.numero_telefone' => 'sometimes|required|string',
                 'enderecos.*.rua' => 'sometimes|required|string',

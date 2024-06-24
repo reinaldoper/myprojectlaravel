@@ -22,7 +22,7 @@ Route::middleware('auth.jwt')->group(function () {
         Route::post('/', 'App\Http\Controllers\ProductController@store');     
         Route::get('/{produto}', 'App\Http\Controllers\ProductController@show'); 
         Route::put('/{produto}', 'App\Http\Controllers\ProductController@update'); 
-        Route::delete('/{produto}', 'App\Http\Controllers\ProductController@destroy'); 
+        Route::delete('/{produto}', 'App\Http\Controllers\ProductController@delete'); 
     });
 
     Route::prefix('vendas')->group(function () {

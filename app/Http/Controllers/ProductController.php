@@ -17,7 +17,12 @@ class ProductController extends Controller
     {
         try {
             $product = Produto::findOrFail($id);
+            if (!$product->is_deleted) {
             return response()->json($product);
+            }
+            else {
+                return response()->json(['message' => 'Product not found'], 404);
+            }
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             return response()->json(['message' => 'Product not found'], 404);
         }
@@ -43,8 +48,8 @@ class ProductController extends Controller
             $product = Produto::findOrFail($id);
 
             $validated = $request->validate([
-                'nome' => 'sometimes|required',
-                'preco' => 'sometimes|required|numeric',
+                'nome' => 'required|string|min:1',
+                'preco' => 'required|numeric|min:1',
             ]);
             $product->update($validated);
             return response()->json($product);
