@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Client;
-use App\Models\Phone;
-use App\Models\Address;
+use App\Models\Cliente;
+use App\Models\Telefone;
+use App\Models\Endereco;
 use Illuminate\Http\Request;
 use App\Rules\CpfValidationRule;
 
@@ -12,20 +12,20 @@ class ClientController extends Controller
 {
     public function index()
     {
-        $clients =  Client::orderBy('id')->get();
+        $clients =  Cliente::orderBy('id')->get();
         return response()->json($clients, 200);
     }
 
     public function show(Request $request, $id)
     {
         try {
-            $client = Client::with(['addresses', 'phones'])->findOrFail($id);
+            $client = Cliente::with(['enderecos', 'telefones'])->findOrFail($id);
 
-            $query = $client->sales()->orderBy('created_at', 'desc');
+            $query = $client->vendas()->orderBy('created_at', 'desc');
 
-            if ($request->has('month') && $request->has('year')) {
-                $month = $request->input('month');
-                $year = $request->input('year');
+            if ($request->has('mes') && $request->has('ano')) {
+                $month = $request->input('mes');
+                $year = $request->input('ano');
                 $query->whereYear('created_at', $year)->whereMonth('created_at', $month);
             }
 
@@ -35,7 +35,7 @@ class ClientController extends Controller
                 return response()->json(['message' => 'No sales found for the specified month and year'], 404);
             }
 
-            $client->sales = $sales;
+            $client->vendas = $sales;
 
             return response()->json($client, 200);
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
@@ -52,37 +52,37 @@ class ClientController extends Controller
     {
         try {
             $validated = $request->validate([
-                'name' => 'required|string|min:3',
+                'nome' => 'required|string|min:3',
                 'cpf' => [
                     'required',
                     'string',
-                    'unique:clients',
+                    'unique:clientes',
                     new CpfValidationRule(),
                 ],
-                'phones.*.number' => 'sometimes|required|string',
-                'addresses.*.street' => 'sometimes|required|string',
-                'addresses.*.city' => 'sometimes|required|string',
-                'addresses.*.state' => 'sometimes|required|string',
-                'addresses.*.zip' => 'sometimes|required|string',
+                'telefones.*.numero_telefone' => 'sometimes|required|string',
+                'enderecos.*.rua' => 'sometimes|required|string',
+                'enderecos.*.cidade' => 'sometimes|required|string',
+                'enderecos.*.estado' => 'sometimes|required|string',
+                'enderecos.*.cep' => 'sometimes|required|string',
             ]);
 
-            $client = Client::create($validated);
+            $client = Cliente::create($validated);
 
-            if (isset($validated['phones'])) {
-                foreach ($validated['phones'] as $phoneData) {
-                    $phone = new Phone($phoneData);
-                    $client->phones()->save($phone);
+            if (isset($validated['telefones'])) {
+                foreach ($validated['telefones'] as $phoneData) {
+                    $phone = new Telefone($phoneData);
+                    $client->telefones()->save($phone);
                 }
             }
 
-            if (isset($validated['addresses'])) {
-                foreach ($validated['addresses'] as $addressData) {
-                    $address = new Address($addressData);
-                    $client->addresses()->save($address);
+            if (isset($validated['enderecos'])) {
+                foreach ($validated['enderecos'] as $addressData) {
+                    $address = new Endereco($addressData);
+                    $client->enderecos()->save($address);
                 }
             }
 
-            $client->load('addresses', 'phones', 'sales.product');
+            $client->load('enderecos', 'telefones', 'vendas.product');
 
             return response()->json($client, 201);
         } catch (\Illuminate\Validation\ValidationException $e) {
@@ -93,39 +93,39 @@ class ClientController extends Controller
     public function update(Request $request, $id)
     {
         try {
-            $client = Client::findOrFail($id);
+            $client = Cliente::findOrFail($id);
 
             $validated = $request->validate([
                 'name' => 'sometimes|required',
-                'cpf' => 'sometimes|required|unique:clients,cpf,' . $client->id,
-                'phones.*.number' => 'sometimes|required|string',
-                'addresses.*.street' => 'sometimes|required|string',
-                'addresses.*.city' => 'sometimes|required|string',
-                'addresses.*.state' => 'sometimes|required|string',
-                'addresses.*.zip' => 'sometimes|required|string',
+                'cpf' => 'sometimes|required|unique:clientes,cpf,' . $client->id,
+                'telefones.*.numero_telefone' => 'sometimes|required|string',
+                'enderecos.*.rua' => 'sometimes|required|string',
+                'enderecos.*.cidade' => 'sometimes|required|string',
+                'enderecos.*.estado' => 'sometimes|required|string',
+                'enderecos.*.cep' => 'sometimes|required|string',
             ]);
 
             $client->update($validated);
 
-            if (isset($validated['phones'])) {
-                $client->phones()->delete();
+            if (isset($validated['telefones'])) {
+                $client->telefones()->delete();
 
-                foreach ($validated['phones'] as $phoneData) {
-                    $phone = new Phone($phoneData);
-                    $client->phones()->save($phone);
+                foreach ($validated['telefones'] as $phoneData) {
+                    $phone = new Telefone($phoneData);
+                    $client->telefones()->save($phone);
                 }
             }
 
-            if (isset($validated['addresses'])) {
-                $client->addresses()->delete();
+            if (isset($validated['enderecos'])) {
+                $client->enderecos()->delete();
 
-                foreach ($validated['addresses'] as $addressData) {
-                    $address = new Address($addressData);
-                    $client->addresses()->save($address);
+                foreach ($validated['enderecos'] as $addressData) {
+                    $address = new Endereco($addressData);
+                    $client->enderecos()->save($address);
                 }
             }
 
-            $client->load('addresses', 'phones', 'sales.product');
+            $client->load('enderecos', 'telefones', 'vendas.product');
 
             return response()->json($client);
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
@@ -139,10 +139,10 @@ class ClientController extends Controller
     public function delete($id)
     {
         try {
-            $client = Client::findOrFail($id);
+            $client = Cliente::findOrFail($id);
             $client->delete();
 
-            return response()->json(null, 204);
+            return response()->json(['message' => 'Client deleted success'], 204);
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             return response()->json(['message' => 'Client not found'], 404);
         }

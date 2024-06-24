@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Sale;
+use App\Models\Venda;
 use Illuminate\Http\Request;
 
 class SaleController extends Controller
@@ -11,15 +11,15 @@ class SaleController extends Controller
     {
         try {
             $validated = $request->validate([
-                'client_id' => 'required|exists:clients,id',
-                'product_id' => 'required|exists:products,id',
-                'quantity' => 'required|integer|min:1',
-                'unit_price' => 'required|numeric',
+                'cliente_id' => 'required|exists:clientes,id',
+                'produto_id' => 'required|exists:produtos,id',
+                'quantidade' => 'required|integer|min:1',
+                'preco_unitario' => 'required|numeric',
             ]);
 
-            $validated['total_price'] = $validated['quantity'] * $validated['unit_price'];
-            $validated['sale_date'] = now();
-            $sale = Sale::create($validated);
+            $validated['preco_total'] = $validated['quantidade'] * $validated['preco_unitario'];
+            $validated['data_venda'] = now();
+            $sale = Venda::create($validated);
             return response()->json($sale, 201);
         } catch (\Illuminate\Validation\ValidationException $e) {
             return response()->json(['message' => 'Validation error', 'errors' => $e->errors()], 422);

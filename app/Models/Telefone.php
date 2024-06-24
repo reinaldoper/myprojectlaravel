@@ -5,14 +5,16 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Phone extends Model
+class Telefone extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['client_id', 'number'];
+    protected $table = 'telefones'; 
+
+    protected $fillable = ['cliente_id', 'numero_telefone'];
 
     public function client()
     {
-        return $this->belongsTo(Client::class);
+        return $this->belongsTo(Cliente::class);
     }
 }

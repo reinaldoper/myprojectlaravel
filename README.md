@@ -119,15 +119,15 @@ Este projeto é um projeto de API construída com Laravel, utilizando MySQL como
     -H "Content-Type: application/json" \
     -H "Authorization: Bearer SEU_TOKEN" \
     -d '{
-        "name": "Cliente Nome",
-        "cpf": "12345678901",
-        "phones": [
-            {"number": "(11) 98765-4321"},
-            {"number": "(11) 12345-6789"}
+        "nome": "Cliente Nome",
+        "cpf": "320.583.140-34",
+        "telefones": [
+            {"numero_telefone": "(11) 98765-4321"},
+            {"numero_telefone": "(11) 12345-6789"}
         ],
-        "addresses": [
-            {"street": "Rua Principal", "city": "São Paulo", "state": "SP", "zip": "12345-678"},
-            {"street": "Avenida Secundária", "city": "Rio de Janeiro", "state": "RJ", "zip": "54321-098"}
+        "enderecos": [
+            {"rua": "Rua Principal", "cidade": "São Paulo", "estado": "SP", "cep": "12345-678"},
+            {"rua": "Avenida Secundária", "cidade": "Rio de Janeiro", "estado": "RJ", "cep": "54321-098"}
         ]
         }'
     ```
@@ -142,7 +142,7 @@ Este projeto é um projeto de API construída com Laravel, utilizando MySQL como
 - **Trazer Cliente com Vendas Filtradas por Mês e Ano**
   
     ```sh
-    curl -X GET "http://localhost:8000/api/clientes/1?month=6&year=2024" \
+    curl -X GET "http://localhost:8000/api/clientes/1?mes=6&ano=2024" \
     -H "Content-Type: application/json" \
     -H "Authorization: Bearer SEU_TOKEN"
 
@@ -155,15 +155,15 @@ Este projeto é um projeto de API construída com Laravel, utilizando MySQL como
     -H "Content-Type: application/json" \
     -H "Authorization: Bearer SEU_TOKEN" \
     -d '{
-        "name": "Cliente novo",
-        "cpf": "12345678901",
-        "phones": [
-            {"number": "(11) 98765-4321"},
-            {"number": "(11) 12345-6789"}
+        "nome": "Cliente Novo",
+        "cpf": "320.583.140-34",
+        "telefones": [
+            {"numero_telefone": "(11) 98765-4321"},
+            {"numero_telefone": "(11) 12345-6789"}
         ],
-        "addresses": [
-            {"street": "Rua Principal", "city": "São Paulo", "state": "SP", "zipcode": "12345-678"},
-            {"street": "Avenida Secundária", "city": "Rio de Janeiro", "state": "RJ", "zipcode": "54321-098"}
+        "enderecos": [
+            {"rua": "Rua Principal", "cidade": "São Paulo", "estado": "SP", "cep": "12345-678"},
+            {"rua": "Avenida Secundária", "cidade": "Rio de Janeiro", "estado": "RJ", "cep": "54321-098"}
         ]
         }'
     ```
@@ -190,7 +190,7 @@ Este projeto é um projeto de API construída com Laravel, utilizando MySQL como
     curl -X POST http://localhost:8000/api/produtos \
     -H "Content-Type: application/json" \
     -H "Authorization: Bearer SEU_TOKEN" \
-    -d '{"name": "Produto Nome", "price": 100.00}'
+    -d '{"nome": "Produto Nome", "preco": 100.00}'
     ```
 
 - **Mostrar Produto**
@@ -206,7 +206,7 @@ Este projeto é um projeto de API construída com Laravel, utilizando MySQL como
     curl -X PUT http://localhost:8000/api/produtos/1 \
     -H "Content-Type: application/json" \
     -H "Authorization: Bearer SEU_TOKEN" \
-    -d '{"name": "Produto Nome Atualizado", "price": 150.00}'
+    -d '{"nome": "Produto Nome", "preco": 100.00}'
     ```
 
 - **Excluir Produto**
@@ -224,5 +224,5 @@ Este projeto é um projeto de API construída com Laravel, utilizando MySQL como
     curl -X POST http://localhost:8000/api/vendas \
     -H "Content-Type: application/json" \
     -H "Authorization: Bearer SEU_TOKEN" \
-    -d '{"client_id": 1, "product_id": 1, "quantity": 2, "unit_price": 100.00, "total_price": 200.00}'
+    -d '{"cliente_id": 2, "produto_id": 1, "quantidade": 2, "preco_unitario": 100.00}'
     ```

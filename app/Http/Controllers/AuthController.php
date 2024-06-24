@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
+use App\Models\Usuario;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -20,11 +20,11 @@ class AuthController extends Controller
         try {
 
             $validated = $request->validate([
-                'email' => 'required|string|email|unique:users,email',
+                'email' => 'required|string|email|unique:usuarios,email',
                 'password' => 'required|string|min:6',
             ]);
 
-            $user = User::create([
+            $user = Usuario::create([
                 'email' => $validated['email'],
                 'password' => Hash::make($validated['password']),
             ]);
