@@ -97,7 +97,11 @@ class ClientController extends Controller
 
             $validated = $request->validate([
                 'nome' => 'sometimes|required',
-                'cpf' => 'sometimes|required|unique:clientes,cpf,' . $client->id,
+                'cpf' => [
+                    'sometimes|required',
+                    'unique:clientes,cpf,' . $client->id,
+                    new CpfValidationRule()
+                ],
                 'telefones.*.numero_telefone' => 'sometimes|required|string',
                 'enderecos.*.rua' => 'sometimes|required|string',
                 'enderecos.*.cidade' => 'sometimes|required|string',
