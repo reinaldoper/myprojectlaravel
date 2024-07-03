@@ -7,6 +7,8 @@ use App\Models\Telefone;
 use App\Models\Endereco;
 use Illuminate\Http\Request;
 use App\Rules\CpfValidationRule;
+use Illuminate\Validation\Rule;
+
 
 class ClientController extends Controller
 {
@@ -19,24 +21,36 @@ class ClientController extends Controller
     public function show(Request $request, $id)
     {
         try {
+            
             $client = Cliente::with(['enderecos', 'telefones'])->findOrFail($id);
 
+            
             $query = $client->vendas()->orderBy('created_at', 'desc');
 
+            
             if ($request->has('mes') && $request->has('ano')) {
                 $month = $request->input('mes');
                 $year = $request->input('ano');
                 $query->whereYear('created_at', $year)->whereMonth('created_at', $month);
+
+              
+                $sales = $query->get();
+
+               
+                if ($sales->isEmpty()) {
+                    return response()->json(['message' => 'No sales found for the specified month and year'], 404);
+                }
+
+              
+                $client->setRelation('vendas', $sales);
+            } else {
+                
+                $sales = $query->get();
+               
+                $client->setRelation('vendas', $sales);
             }
 
-            $sales = $query->get();
-
-            if ($sales->isEmpty()) {
-                return response()->json(['message' => 'No sales found for the specified month and year'], 404);
-            }
-
-            $client->vendas = $sales;
-
+            
             return response()->json($client, 200);
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             return response()->json(['message' => 'Client not found'], 404);
@@ -44,6 +58,7 @@ class ClientController extends Controller
             return response()->json(['message' => 'Validation error', 'errors' => $e->errors()], 422);
         }
     }
+
 
 
 
@@ -98,8 +113,9 @@ class ClientController extends Controller
             $validated = $request->validate([
                 'nome' => 'sometimes|required',
                 'cpf' => [
-                    'sometimes|required',
-                    'unique:clientes,cpf,' . $client->id,
+                    'sometimes',
+                    'required',
+                    Rule::unique('clientes', 'cpf')->ignore($client->id),
                     new CpfValidationRule()
                 ],
                 'telefones.*.numero_telefone' => 'sometimes|required|string',
